@@ -82,7 +82,7 @@ class PhoneVerifyActivity : ComponentActivity() {
                         vm.open.collectAsState().value.let {
                             if(it) DialogBoxLoading()
                         }
-                        BottomButton("Verify") {
+                        BottomButton(application.resources.getString(R.string.verify)) {
                             this@PhoneVerifyActivity.hideKeyboard()
                             if(application.isNetworkAvailable()){
                                 if(vm.selectedIndex>-1) {
