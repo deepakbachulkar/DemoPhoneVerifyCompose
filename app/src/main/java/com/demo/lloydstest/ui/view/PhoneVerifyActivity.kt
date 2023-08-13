@@ -22,10 +22,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import com.demo.lloydstest.R
 import com.demo.lloydstest.ui.components.BottomButton
 import com.demo.lloydstest.ui.components.HeaderText
 import com.demo.lloydstest.ui.components.LabelText
@@ -34,10 +37,15 @@ import com.demo.lloydstest.ui.components.PhoneDetailsView
 import com.demo.lloydstest.ui.theme.LLOYDSTestTheme
 import com.demo.lloydstest.ui.theme.labelTextStyle
 import com.demo.lloydstest.ui.utils.DialogBoxLoading
+import com.demo.lloydstest.ui.utils.Tag
+import com.demo.lloydstest.ui.utils.Tag.COUNTRY_CODE
+import com.demo.lloydstest.ui.utils.Tag.PHONE_NUMBER
+import com.demo.lloydstest.ui.utils.hideKeyboard
+import com.demo.lloydstest.ui.utils.isNetworkAvailable
+import com.demo.lloydstest.utils.Utils
 import com.demo.lloydstest.viewModel.ViewModelPhoneVerify
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
@@ -55,19 +63,18 @@ class PhoneVerifyActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(state = rememberScrollState(), enabled = true)
+                        modifier = Modifier.fillMaxSize().verticalScroll(state = rememberScrollState(), enabled = true)
                     ) {
-                        HeaderText("Phone Number Verify")
-                        LabelText("Select Country", textAlign = TextAlign.Start)
-                        vm.countriesStateFlow.collectAsState().value.let{
+                        HeaderText(application.resources.getString(R.string.phone_number_verify))
+                        LabelText(application.resources.getString(R.string.select_country), textAlign = TextAlign.Start)
+                        vm.countriesStateFlow.collectAsState().value.let {
                             if(it.isNotEmpty())
                                 LargeDropdownMenu(
-                                    label = "Country Code",
-                                    items =it,
+                                    label = application.resources.getString(R.string.country_code),
+                                    items = it,
                                     selectedIndex = vm.selectedIndex,
                                     onItemSelected = { index, _ -> vm.selectedIndex = index },
+                                    modifier = Modifier.testTag(COUNTRY_CODE)
                                 )
                         }
                         LabelText("Enter Phone Number")
@@ -75,24 +82,33 @@ class PhoneVerifyActivity : ComponentActivity() {
                         vm.open.collectAsState().value.let {
                             if(it) DialogBoxLoading()
                         }
-                        BottomButton("Verify"){
-                            if(vm.phoneNumber.isNotEmpty() && vm.selectedIndex>-1) {
-                                val code = vm.countriesStateFlow.value[vm.selectedIndex].let {
-                                    it.diallingCode?.substring(1)
+                        BottomButton("Verify") {
+                            this@PhoneVerifyActivity.hideKeyboard()
+                            if(application.isNetworkAvailable()){
+                                if(vm.selectedIndex>-1) {
+                                    val code = vm.countriesStateFlow.value[vm.selectedIndex].let {
+                                        it.diallingCode?.substring(1)
+                                    }
+                                    if(Utils.validationInput(code?:"", vm.phoneNumber)){
+                                        vm.hitValidatePhoneNumber("${code}${vm.phoneNumber}")
+                                    }else {
+                                        Toast.makeText(this@PhoneVerifyActivity, application.resources.getString(R.string.please_enter_phone_number), Toast.LENGTH_LONG).show()
+                                    }
+                                }else{
+                                    Toast.makeText(this@PhoneVerifyActivity, application.resources.getString(R.string.please_select_country_code) , Toast.LENGTH_LONG).show()
                                 }
-                                vm.hitValidatePhoneNumber("${code}${vm.phoneNumber}")
-                            }else {
-                                Toast.makeText(this@PhoneVerifyActivity, "Please select country code and enter phone number", Toast.LENGTH_LONG).show()
+                            }else{
+                                lifecycleScope.launch(Dispatchers.Default) {
+                                    vm.sharedFlowMessage.emit(application.getString(R.string.network_not_available))
+                                }
                             }
                         }
-
                         vm.verifyPhoneDetails.collectAsState().value?.let {
                             if(it.valid){
-//                                val myColor: Int = Color.parseColor("#3F51B5")
-                                MessageText("Phone number is valid", textColor = Color(0XFF0277BD))
+                                MessageText(application.resources.getString(R.string.phone_number_is_valid), textColor = Color(0XFF0277BD))
                                 PhoneDetailsView(it)
                             }else{
-                                MessageText("Phone number is not valid", textColor = Color.Red)
+                                MessageText(application.resources.getString(R.string.phone_number_is_not_valid), textColor = Color.Red)
                             }
                         }
                     }
@@ -100,11 +116,22 @@ class PhoneVerifyActivity : ComponentActivity() {
             }
         }
 
-        GlobalScope.launch(Dispatchers.Main) {
+        lifecycleScope.launch(Dispatchers.Main) {
             vm.sharedFlowMessage.collect{
                 if(it.isNotEmpty()){
                     Toast.makeText(this@PhoneVerifyActivity, it, Toast.LENGTH_LONG).show()
                 }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(application.isNetworkAvailable())
+            vm.hitCountryCodesData()
+        else{
+            lifecycleScope.launch(Dispatchers.Default) {
+                vm.sharedFlowMessage.emit(application.getString(R.string.network_not_available))
             }
         }
     }
@@ -117,18 +144,18 @@ class PhoneVerifyActivity : ComponentActivity() {
             onValueChange = {
                 vm.phoneNumber = it
             },
-            label = { Text(text = "Phone number") },
+            label = { Text(text = application.resources.getString(R.string.phone_number)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .padding(20.dp, 0.dp)
-                .fillMaxSize(),
+                .fillMaxSize().testTag(PHONE_NUMBER),
         )
     }
 
     @Composable
     fun MessageText(
         text: String,
-        modifier: Modifier = Modifier,
+        modifier: Modifier = Modifier.testTag(Tag.VERIFY_MESSAGE),
         textColor:Color= Color.Black,
         style: TextStyle = labelTextStyle,
         textAlign: TextAlign = TextAlign.Start) {

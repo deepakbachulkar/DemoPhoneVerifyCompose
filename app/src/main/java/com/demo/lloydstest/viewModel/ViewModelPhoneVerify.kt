@@ -21,12 +21,9 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class ViewModelPhoneVerify @Inject constructor(val repository: Repository) : ViewModel() {
+open class ViewModelPhoneVerify @Inject constructor(private val repository: Repository) : ViewModel() {
 
     val countriesStateFlow:MutableStateFlow<ArrayList<Country>> =  MutableStateFlow(arrayListOf())
-
-//    val countrySelected:MutableStateFlow<Int> =  MutableStateFlow(0)
-
     var open:MutableStateFlow<Boolean> =  MutableStateFlow(false)
 
     var selectedIndex by mutableStateOf(-1)
@@ -36,9 +33,8 @@ class ViewModelPhoneVerify @Inject constructor(val repository: Repository) : Vie
 
     var sharedFlowMessage: MutableSharedFlow<String> =  MutableSharedFlow()
 
-    init {
-        hitCountryCodesData()
-    }
+
+    init {}
 
     private fun openDialog() {
         open.value = true
@@ -48,6 +44,9 @@ class ViewModelPhoneVerify @Inject constructor(val repository: Repository) : Vie
         open.value= false
     }
 
+    /**
+     * API call of get country code
+     * **/
     fun hitCountryCodesData() =
         viewModelScope.launch {
             kotlin.runCatching {

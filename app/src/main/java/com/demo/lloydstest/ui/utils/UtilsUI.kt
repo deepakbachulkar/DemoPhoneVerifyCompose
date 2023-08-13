@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,16 +43,6 @@ fun Context.isNetworkAvailable(): Boolean {
     return (network != null)
 }
 
-
-
-@Composable
-fun SnackBars(message:String) {
-    Text(text = "Snackbars", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(8.dp))
-    Snackbar(modifier = Modifier.padding(4.dp)) {
-        Text(text = message)
-    }
-}
-
 fun Activity.hideKeyboard() {
     val inputMethodManager =
         this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -64,15 +52,6 @@ fun Activity.hideKeyboard() {
         view = View(this)
     }
     inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-}
-fun Context.showToast(message: String, duration: Int = Toast.LENGTH_LONG) {
-    if (message.isNotEmpty()) {
-        try {
-            Toast.makeText(this, message, duration).show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 }
 
 
@@ -152,7 +131,7 @@ fun ProgressIndicatorLoading(progressIndicatorSize: Dp, progressIndicatorColor: 
                 12.dp,
                 brush = Brush.sweepGradient(
                     listOf(
-                        Color.White, // add background color first
+                        Color.White,
                         progressIndicatorColor.copy(alpha = 0.1f),
                         progressIndicatorColor
                     )
@@ -160,6 +139,6 @@ fun ProgressIndicatorLoading(progressIndicatorSize: Dp, progressIndicatorColor: 
                 shape = CircleShape
             ),
         strokeWidth = 1.dp,
-        color = Color.White // Set background color
+        color = Color.White
     )
 }

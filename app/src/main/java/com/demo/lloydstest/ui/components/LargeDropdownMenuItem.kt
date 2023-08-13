@@ -32,9 +32,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-
+import com.demo.lloydstest.ui.utils.Tag
+import com.demo.lloydstest.ui.utils.Tag.DROP_DOWN_SELECT
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +66,7 @@ fun <T> LargeDropdownMenu(
             label = { Text(label) },
             value = items.getOrNull(selectedIndex)?.let { selectedItemToString(it) } ?: "",
             enabled = enabled,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(20.dp, 0.dp),
             trailingIcon = {
                 val icon =  Icons.Filled.ArrowDropDown
                 Icon(icon, "")
@@ -98,7 +100,7 @@ fun <T> LargeDropdownMenu(
                     }
                 }
 
-                LazyColumn(modifier = Modifier.fillMaxWidth(), state = listState) {
+                LazyColumn(modifier = Modifier.fillMaxWidth().testTag(DROP_DOWN_SELECT), state = listState) {
                     if (notSetLabel != null) {
                         item {
                             LargeDropdownMenuItem(
@@ -153,6 +155,7 @@ fun LargeDropdownMenuItem(
             Text(
                 text = text,
                 style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.testTag(Tag.COUNTRY_CODE)
             )
         }
     }

@@ -10,13 +10,9 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
@@ -40,28 +36,6 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
-
-val titleTextStyle = TextStyle(
-    color = Color.White,
-    fontSize = 22.sp,
-    fontWeight = FontWeight.Bold
-)
-val labelTextStyle = TextStyle(
-    color = Color.Black,
-    fontSize = 20.sp,
-    fontWeight = FontWeight.Bold
-)
-val valueTextStyle = TextStyle(
-    color = Color.DarkGray,
-    fontSize = 18.sp,
-    fontWeight = FontWeight.Normal
-)
-val buttonStyle = TextStyle(
-    color = Color.White,
-    fontSize = 20.sp,
-    fontWeight = FontWeight.Bold
-)
-
 
 @Composable
 fun LLOYDSTestTheme(
@@ -92,6 +66,4 @@ fun LLOYDSTestTheme(
         typography = Typography,
         content = content
     )
-
-
 }

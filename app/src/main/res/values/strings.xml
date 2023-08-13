@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">LLOYDS Test</string>
     <string name="some_error_occurred">Something went wrong.</string>
+    <string name="network_not_available">Network not available</string>
+    <string name="phone_number_verify">Phone Number Verify</string>
+    <string name="select_country">Select Country</string>
+    <string name="please_enter_phone_number">Please enter phone number</string>
+    <string name="please_select_country_code">Please select country code</string>
+    <string name="phone_number_is_not_valid">Phone number is not valid</string>
+    <string name="phone_number_is_valid">Phone number is valid\n</string>
+    <string name="phone_number">Phone number</string>
+    <string name="country_code">Country Code</string>
 </resources>
